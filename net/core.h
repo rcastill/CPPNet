@@ -18,6 +18,7 @@ typedef int socklen_t;
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include <unistd.h>
 #endif
 
 const int BUFFER_SIZE = 256;
