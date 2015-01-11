@@ -16,7 +16,7 @@ namespace net {
             return;
 
         else {
-            int len = sizeof(address);
+            socklen_t len = sizeof(address);
             getsockname(fd, (sockaddr *) &address, &len);
             addr = new Address(address);
         }
