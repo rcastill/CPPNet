@@ -1,8 +1,8 @@
 #include <iostream>
-#include "net/core.h"
-#include "net/address.h"
-#include "net/dgsocket.h"
-#include "net/packet.h"
+#include "include/net/core.h"
+#include "include/net/address.h"
+#include "include/net/dgsocket.h"
+#include "include/net/packet.h"
 
 using namespace net;
 using namespace std;

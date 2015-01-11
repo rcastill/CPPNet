@@ -1,5 +1,5 @@
-#include "net/core.h"
-#include "net/dgsocket.h"
+#include "include/net/core.h"
+#include "include/net/dgsocket.h"
 
 using namespace std;
 

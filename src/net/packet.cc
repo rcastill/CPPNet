@@ -1,4 +1,4 @@
-#include "packet.h"
+#include "../../include/net/packet.h"
 
 namespace net {
 

@@ -1,4 +1,4 @@
-#include "address.h"
+#include "../../include/net/address.h"
 
 Address::Address(unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned short port) {
     address = (a << 24) | (b << 16) | (c << 8) | d;

@@ -1,4 +1,4 @@
-#include "dgsocket.h"
+#include "../../include/net/dgsocket.h"
 
 namespace net {
     DatagramSocket::DatagramSocket(unsigned short port) {
@@ -82,5 +82,7 @@ namespace net {
 
         sender.Set(from);
         packet.SetData(data, BUFFER_SIZE);
+
+        return recvBytes;
     }
 }
