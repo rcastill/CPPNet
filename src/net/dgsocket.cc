@@ -106,9 +106,8 @@ namespace net {
 
         int recvBytes = recvfrom(fd, data, size, flags, (sockaddr *) &from, &fromLength);
 
-        if (recvBytes <= 0) {
+        if (recvBytes <= 0)
             return 0;
-        }
 
         sender.Set(from);
         //packet.SetData(data, BUFFER_SIZE);

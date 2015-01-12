@@ -70,6 +70,10 @@ int main(int argc, char **argv) {
         if (server.IsValid() && server.IsBound()) {
             cout << "Server bound @ " << server.GetAddress().ToString() << endl;
             cout << "Receive timeout set to " << timeout << endl;
+
+            if (timeout != 0)
+                server.SetNonBlocking();
+
             server.SetTimeout(timeout);
             server.Mainloop();
             net::NetworkShutdown();
