@@ -29,6 +29,7 @@ using namespace std;
 namespace net {
     bool NetworkInit();
     void NetworkShutdown();
+    void Wait(float);
 }
 
 #endif

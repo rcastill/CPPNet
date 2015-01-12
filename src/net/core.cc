@@ -16,4 +16,12 @@ namespace net {
         WSACleanup();
         #endif
     }
+
+    void Wait(float secs) {
+        #if PLATFORM == PLATFORM_WINDOWS
+        Sleep((DWORD) (secs * 1000.0f));
+        #elif PLATFORM == PLATFORM_UNIX
+        usleep((int) (secs * 1000000.0f));
+        #endif
+    }
 }

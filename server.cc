@@ -19,8 +19,18 @@ namespace net {
             Address address;
             Packet packet;
 
-            cout << "Waiting for packet..." << endl;
-            Receive(address, packet);
+            cout << "Waiting for packet... ";
+            int bytes = Receive(address, packet);
+
+            if (bytes == -1) {
+                cout << "Timeout!" << endl;
+                continue;
+            }
+
+            cout << "Received " << bytes << " bytes." << endl;
+
+            if (bytes == 0) continue;
+
 
             unsigned int i;
             for (i = 0; i < clients.size(); i++)
@@ -37,7 +47,7 @@ namespace net {
             string greetings = "Greetings!";
 
             Send(address, Packet(greetings));
-            cout << "Greetings sent";
+            cout << "Greetings sent" << endl;
         }
     }
 
@@ -54,6 +64,7 @@ int main(int argc, char **argv) {
 
         if (server.IsValid() && server.IsBound()) {
             cout << "Server bound @ " << server.GetAddress().ToString() << endl;
+            server.SetTimeout(2000);
             server.Mainloop();
             net::NetworkShutdown();
         }

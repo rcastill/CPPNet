@@ -4,6 +4,7 @@ namespace net {
     DatagramSocket::DatagramSocket(unsigned short port) {
         fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
         addr = NULL;
+        usecTimeout = 0;
 
         if (fd <= 0) return;
 
@@ -59,6 +60,20 @@ namespace net {
         return true;
     }
 
+    void DatagramSocket::SetTimeout(long ms) {
+        usecTimeout = ms * 1000;
+    }
+
+    #if PLATFORM == PLATFORM_WINDOWS
+    SOCKET DatagramSocket::GetSocket() const {
+        return fd;
+    }
+    #elif PLATFORM == PLATFORM_UNIX
+    int DatagramSocket::GetSocket() const {
+        return fd;
+    }
+    #endif
+
     const Address &DatagramSocket::GetAddress() {
         return *addr;
     }
@@ -75,7 +90,24 @@ namespace net {
         socklen_t fromLength = sizeof(from);
         char *data = new char[BUFFER_SIZE];
 
-        int recvBytes = recvfrom(fd, data, BUFFER_SIZE, flags, (sockaddr *) &from, &fromLength);
+        int retval = -2;
+        int recvBytes = 0;
+
+        if (usecTimeout != 0) {
+            fd_set rfds;
+            timeval tv;
+            FD_ZERO(&rfds);
+            FD_SET(fd, &rfds);
+            tv.tv_sec = 0;
+            tv.tv_usec = usecTimeout;
+            retval = select(1, &rfds, NULL, NULL, &tv);
+        }
+
+        if (retval > 0)
+            recvBytes = recvfrom(fd, data, BUFFER_SIZE, flags, (sockaddr *) &from, &fromLength);
+
+        else // timeout
+            return -1;
 
         if (recvBytes <= 0)
             return 0;

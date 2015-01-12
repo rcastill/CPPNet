@@ -14,6 +14,7 @@ namespace net {
         int fd;
         #endif
         Address *addr;
+        long usecTimeout;
 
     public:
         DatagramSocket(unsigned short port = 0);
@@ -25,6 +26,13 @@ namespace net {
         bool IsBound() const;
 
         bool SetNonBlocking();
+        void SetTimeout(long);
+
+        #if PLATFORM == PLATFORM_WINDOWS
+        SOCKET GetSocket() const;
+        #elif PLATFORM == PLATFORM_UNIX
+        int GetSocket() const;
+        #endif
 
         const Address &GetAddress();
 
