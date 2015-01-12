@@ -57,6 +57,10 @@ unsigned short Address::GetPort() const {
     return port;
 }
 
+bool Address::operator==(const Address &other) {
+    return (address == other.address && port == other.port);
+}
+
 string Address::ToString() const {
     stringstream ss;
     ss << (int) GetA() << "." << (int) GetB() << "." << (int) GetC() << "." << (int) GetD() << ":" << port;

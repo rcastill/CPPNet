@@ -33,6 +33,8 @@ public:
 
     unsigned short GetPort() const;
 
+    bool operator==(const Address &);
+
     string ToString() const;
 };
 
