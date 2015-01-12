@@ -88,7 +88,9 @@ namespace net {
     int DatagramSocket::Receive(Address &sender, Packet &packet, int flags) {
         sockaddr_in from;
         socklen_t fromLength = sizeof(from);
-        char *data = new char[BUFFER_SIZE];
+        //char *data = new char[BUFFER_SIZE];
+        char *data = packet.GetData();
+        int size = packet.Size();
 
         int retval = -2;
         int recvBytes = 0;
@@ -104,7 +106,7 @@ namespace net {
         }
 
         if (retval > 0)
-            recvBytes = recvfrom(fd, data, BUFFER_SIZE, flags, (sockaddr *) &from, &fromLength);
+            recvBytes = recvfrom(fd, data, size, flags, (sockaddr *) &from, &fromLength);
 
         else // timeout
             return -1;
@@ -113,7 +115,7 @@ namespace net {
             return 0;
 
         sender.Set(from);
-        packet.SetData(data, BUFFER_SIZE);
+        //packet.SetData(data, BUFFER_SIZE);
 
         return recvBytes;
     }

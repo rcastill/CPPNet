@@ -15,10 +15,12 @@ namespace net {
     public:
         Packet(char *, int, bool clean=true);
         Packet(std::string);
-        void SetData(char *, int, bool clean=true);
+        Packet(int);
         Packet();
         ~Packet();
 
+        void Allocate(int);
+        void SetData(char *, int, bool clean=true);
         char *GetData() const;
         int Size() const;
     };

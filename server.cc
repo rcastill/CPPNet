@@ -17,7 +17,7 @@ namespace net {
     void Server::Mainloop() {
         while (running) {
             Address address;
-            Packet packet;
+            Packet packet(BUFFER_SIZE);
 
             cout << "Waiting for packet... ";
             int bytes = Receive(address, packet);
@@ -30,7 +30,6 @@ namespace net {
             cout << "Received " << bytes << " bytes." << endl;
 
             if (bytes == 0) continue;
-
 
             unsigned int i;
             for (i = 0; i < clients.size(); i++)

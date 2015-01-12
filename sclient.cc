@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
         cout << "Sent" << endl;
 
         Address address;
-        Packet packet;
+        Packet packet(BUFFER_SIZE);
 
         fd_set rfds;
         timeval tv;

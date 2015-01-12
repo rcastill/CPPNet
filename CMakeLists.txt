@@ -16,21 +16,17 @@ target_link_libraries(DatagramSocket Packet)
 set(SOURCE_FILES main.cc)
 add_executable(CPPNet ${SOURCE_FILES})
 add_executable(SClient sclient.cc)
-add_executable(RClient rclient.cc)
 add_executable(Server server.cc)
 
 
 target_link_libraries(CPPNet NetCore DatagramSocket)
 target_link_libraries(SClient NetCore DatagramSocket)
-target_link_libraries(RClient NetCore DatagramSocket)
 target_link_libraries(Server DatagramSocket Address Packet NetCore)
 
 if (WIN32)
 target_link_libraries(CPPNet wsock32 ws2_32)
 target_link_libraries(Address wsock32 ws2_32)
 target_link_libraries(SClient wsock32 ws2_32)
-target_link_libraries(RClient wsock32 ws2_32)
-
 add_definitions(-DWIN32)
 endif()
 
