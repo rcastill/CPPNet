@@ -92,9 +92,6 @@ namespace net {
         char *data = packet.GetData();
         int size = packet.Size();
 
-        int retval = -2;
-        int recvBytes = 0;
-
         if (usecTimeout != 0) {
             fd_set rfds;
             timeval tv;
@@ -102,17 +99,16 @@ namespace net {
             FD_SET(fd, &rfds);
             tv.tv_sec = 0;
             tv.tv_usec = usecTimeout;
-            retval = select(1, &rfds, NULL, NULL, &tv);
+
+            if (select(1, &rfds, NULL, NULL, &tv) <= 0)
+                return -1;
         }
 
-        if (retval > 0)
-            recvBytes = recvfrom(fd, data, size, flags, (sockaddr *) &from, &fromLength);
+        int recvBytes = recvfrom(fd, data, size, flags, (sockaddr *) &from, &fromLength);
 
-        else // timeout
-            return -1;
-
-        if (recvBytes <= 0)
+        if (recvBytes <= 0) {
             return 0;
+        }
 
         sender.Set(from);
         //packet.SetData(data, BUFFER_SIZE);
