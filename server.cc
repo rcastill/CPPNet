@@ -54,16 +54,23 @@ namespace net {
 
 int main(int argc, char **argv) {
     unsigned short port = 50000;
+    long timeout = 0;
 
     if (argc == 2)
         port = (unsigned short) atoi(argv[1]);
+
+    if (argc == 3) {
+        port = (unsigned short) atoi(argv[1]);
+        timeout = atol(argv[2]);
+    }
 
     if (net::NetworkInit()) {
         net::Server server(port);
 
         if (server.IsValid() && server.IsBound()) {
             cout << "Server bound @ " << server.GetAddress().ToString() << endl;
-            server.SetTimeout(2000);
+            cout << "Receive timeout set to " << timeout << endl;
+            server.SetTimeout(timeout);
             server.Mainloop();
             net::NetworkShutdown();
         }
