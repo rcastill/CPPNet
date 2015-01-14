@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
             cout << "Server bound @ " << server.GetAddress().ToString() << endl;
             cout << "Receive timeout set to " << timeout << endl;
 
+            // FIXME Timeout not working
             if (timeout != 0)
                 server.SetNonBlocking();
 

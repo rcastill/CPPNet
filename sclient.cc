@@ -10,7 +10,7 @@ using namespace net;
 
 int main(int argc, char **argv) {
     if (NetworkInit()) {
-        DatagramSocket datagramSocket(5429);
+        DatagramSocket datagramSocket;
         //datagramSocket.SetNonBlocking();
 
         if (datagramSocket.IsBound()) {
