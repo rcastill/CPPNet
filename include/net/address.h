@@ -13,24 +13,24 @@ private:
     unsigned short port;
 
 public:
+    static int BYTES;
+
     Address(unsigned char, unsigned char, unsigned char, unsigned char, unsigned short);
+    Address(unsigned int, unsigned short);
     Address(const sockaddr_in &);
     Address();
 
+    void Set(unsigned int, unsigned short);
     void Set(const sockaddr_in &);
 
-    static Address &New(unsigned char, unsigned char, unsigned char, unsigned char, unsigned short);
-    static Address &New();
-
     void Fill(sockaddr_in &) const;
-
-    unsigned int GetAddress() const;
 
     unsigned char GetA() const;
     unsigned char GetB() const;
     unsigned char GetC() const;
     unsigned char GetD() const;
 
+    unsigned int GetAddress() const;
     unsigned short GetPort() const;
 
     bool operator==(const Address &);

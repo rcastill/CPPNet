@@ -3,26 +3,18 @@
 
 #include <cstddef>
 #include <iostream>
+#include "bytebuffer.h"
 
 namespace net {
 
-    class Packet {
-    protected:
-        int size;
-        char *data;
-        bool shouldClean;
-
+    class Packet : public ByteBuffer {
     public:
-        Packet(char *, int, bool clean=true);
-        Packet(std::string);
+        Packet(char *, int);
         Packet(int);
+        Packet(std::string);
         Packet();
-        ~Packet();
 
-        void Allocate(int);
-        void SetData(char *, int, bool clean=true);
-        char *GetData() const;
-        int Size() const;
+        virtual void Process() = 0;
     };
 }
 

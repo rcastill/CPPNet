@@ -2,42 +2,13 @@
 
 namespace net {
 
-    Packet::Packet(char *data, int size, bool clean) {
-        SetData(data, size, clean);
+    Packet::Packet(char *data, int size) : ByteBuffer(data, size) {}
+
+    Packet::Packet(int cap) : ByteBuffer(cap) {}
+
+    Packet::Packet(std::string stream) : Packet((char *) stream.c_str(), stream.size() + 1) {
+        DisableDestructor();
     }
 
-    Packet::Packet(std::string stream) : Packet((char *) stream.c_str(), stream.size() + 1, false) {}
-
-    Packet::Packet(int cap) {
-        Allocate(cap);
-    }
-
-    Packet::Packet() {
-        data = NULL;
-        size = 0;
-    }
-
-    Packet::~Packet() {
-        if (data != NULL && shouldClean)
-            delete[] data;
-    }
-
-    void Packet::Allocate(int cap) {
-        char *buffer = new char[cap];
-        SetData(buffer, cap, true);
-    }
-
-    void Packet::SetData(char *data, int size, bool clean) {
-        this->data = data;
-        this->size = size;
-        shouldClean = clean;
-    }
-
-    char *Packet::GetData() const {
-        return data;
-    }
-
-    int Packet::Size() const {
-        return size;
-    }
+    Packet::Packet() : ByteBuffer() {}
 }

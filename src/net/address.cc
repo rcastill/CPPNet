@@ -1,8 +1,14 @@
 #include "../../include/net/address.h"
 
+int Address::BYTES = sizeof(unsigned int) + sizeof(unsigned short);
+
 Address::Address(unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned short port) {
     address = (a << 24) | (b << 16) | (c << 8) | d;
     this->port = port;
+}
+
+Address::Address(unsigned int address, unsigned short port) {
+    Set(address, port);
 }
 
 Address::Address(const sockaddr_in &addr) {
@@ -14,17 +20,14 @@ Address::Address() {
     port = 0;
 }
 
+void Address::Set(unsigned int address, unsigned short port) {
+    this->address = address;
+    this->port = port;
+}
+
 void Address::Set(const sockaddr_in &addr) {
     address = ntohl(addr.sin_addr.s_addr);
     port = ntohs(addr.sin_port);
-}
-
-Address& Address::New(unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned short port) {
-    return *(new Address(a, b, c, d, port));
-}
-
-Address& Address::New() {
-    return *(new Address());
 }
 
 void Address::Fill(sockaddr_in &sockaddrIn) const {

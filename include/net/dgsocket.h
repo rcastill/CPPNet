@@ -36,6 +36,9 @@ namespace net {
 
         const Address &GetAddress();
 
+        bool Send(const Address *, const Packet *, int flags = 0);
+        int Receive(Address *, Packet *, int flags = 0);
+
         bool Send(const Address &, const Packet &, int flags = 0);
         int Receive(Address &, Packet &, int flags = 0);
     };

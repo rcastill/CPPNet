@@ -6,25 +6,54 @@ template <class T> T GetNonFloating(ByteBuffer *);
 
 ByteBuffer::ByteBuffer(void *buffer, int cap) {
     this->buffer = (char *) buffer;
-    //memset(buffer, 0, cap);
+    //memset(buffer, 0, (size_t) cap);
     this->cap = cap;
     ptr = 0;
     shouldClean = true;
-    shouldTrackCopies = false;
+    copies = NULL;
 }
 
-ByteBuffer::ByteBuffer(int cap) : ByteBuffer(new char[cap], cap) {}
+ByteBuffer::ByteBuffer(int cap) : ByteBuffer(new char[cap], cap) {
+    memset(buffer, 0, (size_t) cap);
+}
+
+/**
+* Constructor designed to be transfered in
+*/
+ByteBuffer::ByteBuffer() {
+    buffer = NULL;
+    cap = 0;
+    ptr = 0;
+    shouldClean = false;
+    copies = NULL;
+}
 
 ByteBuffer::~ByteBuffer() {
     if (shouldClean)
         delete[] buffer;
 
-    if (shouldTrackCopies)
-        for (int i = 0; i < copies.size(); i++)
-            delete[] copies[i];
+    if (copies != NULL)
+        for (int i = 0; i < copies->size(); i++)
+            delete[] (*copies)[i];
 }
 
-void *ByteBuffer::GetBuffer() {
+void ByteBuffer::Transfer(ByteBuffer *other) {
+    other->buffer = buffer;
+    other->ptr = ptr;
+    other->cap = cap;
+    other->shouldClean = shouldClean;
+    other->copies = copies;
+
+    DisableDestructor();
+    buffer = NULL;
+    copies = NULL;
+}
+
+void ByteBuffer::Transfer(ByteBuffer &other) {
+    Transfer(&other);
+}
+
+void *ByteBuffer::GetBuffer() const {
     return buffer;
 }
 
@@ -32,10 +61,14 @@ void *ByteBuffer::GetBufferCopy() {
     char *copy = new char[cap];
     memcpy(copy, buffer, (size_t) cap);
 
-    if (shouldTrackCopies)
-        copies.push_back(copy);
+    if (copies != NULL)
+        copies->push_back(copy);
 
     return copy;
+}
+
+char &ByteBuffer::operator[](unsigned int i) {
+    return buffer[i];
 }
 
 void ByteBuffer::DisableDestructor() {
@@ -43,7 +76,7 @@ void ByteBuffer::DisableDestructor() {
 }
 
 void ByteBuffer::TakeCareOfCopies() {
-    shouldTrackCopies = true;
+    copies = new vector<char *>;
 }
 
 void ByteBuffer::Pointer(int ptr) {
@@ -60,7 +93,12 @@ void ByteBuffer::Rewind() {
 }
 
 bool ByteBuffer::Put(char c) {
-    return PutNonFloating<char>(this, c);
+    if (ptr < cap) {
+        buffer[ptr++] = c;
+        return true;
+    }
+
+    return false;
 }
 
 bool ByteBuffer::PutShort(short s) {
@@ -76,7 +114,7 @@ bool ByteBuffer::PutLong(long l) {
 }
 
 char ByteBuffer::Get() {
-    return GetNonFloating<char>(this);
+    return buffer[ptr++];
 }
 
 short ByteBuffer::GetShort() {
@@ -97,44 +135,38 @@ int ByteBuffer::Size() const {
 
 template <class T>
 bool PutNonFloating(ByteBuffer *bb, T t) {
-    int BYTES = sizeof(T);
-    char *buffer = (char *) bb->GetBuffer();
+    int bytes = sizeof(T);
 
-    if (bb->Pointer() + BYTES > bb->Size())
+    if (bb->Pointer() + bytes > bb->Size())
         return false;
 
     // little endian
-    /*for (int i = 0; i < BYTES; i++) {
+    /*for (int i = 0; i < bytes; i++) {
         buffer[bb->Pointer()] = (char) (t >> 8 * i);
         bb->Pointer(bb->Pointer() + 1);
     }*/
 
     // big endian
-    for (int i = BYTES - 1; i >= 0; i--) {
-        buffer[bb->Pointer()] = (char) (t >> 8 * i);
-        bb->Pointer(bb->Pointer() + 1);
-    }
+    for (int i = bytes - 1; i >= 0; i--)
+        bb->Put((char) ((t >> 8 * i) & 0xff)); // CLEAN EVERYTHING
 
     return true;
 }
 
 template <class T>
 T GetNonFloating(ByteBuffer *bb) {
-    int BYTES = sizeof(T);
-    char *buffer = (char *) bb->GetBuffer();
+    int bytes = sizeof(T);
     T t = 0; // PLEASE DO NEVER FORGET TO INITIALIZE. THANKS.
 
     // little endian
-    /*for (int i = 0; i < BYTES; i++) {
+    /*for (int i = 0; i < bytes; i++) {
         t |= (((T) buffer[bb->Pointer()]) << 8 * i);
         bb->Pointer(bb->Pointer() + 1);
     }*/
 
     // big endian
-    for (int i = BYTES - 1; i >= 0; i--) {
-        t |= (((T) buffer[bb->Pointer()]) << 8 * i);
-        bb->Pointer(bb->Pointer() + 1);
-    }
+    for (int i = bytes - 1; i >= 0; i--)
+        t |= (((T) bb->Get()) & 0xff) << 8 * i; // EVEN CASTS!
 
     return t;
 }

@@ -8,22 +8,26 @@
 using namespace std;
 
 class ByteBuffer {
-private:
+protected:
     char *buffer;
     int ptr, cap;
-    bool shouldClean, shouldTrackCopies;
-    vector<char *> copies;
+    bool shouldClean;
+    vector<char *> *copies;
 
 public:
     ByteBuffer(int);
     ByteBuffer(void *, int);
-    ~ByteBuffer();
+    ByteBuffer();
+    virtual ~ByteBuffer();
 
+    void Transfer(ByteBuffer *);
+    void Transfer(ByteBuffer &);
     void DisableDestructor();
     void TakeCareOfCopies();
 
-    void *GetBuffer();
+    void *GetBuffer() const;
     void *GetBufferCopy();
+    char &operator[](const unsigned int);
 
     bool Put(char);
     bool PutShort(short);

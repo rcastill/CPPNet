@@ -1,7 +1,7 @@
 #include "server.h"
 
-namespace net {
 
+namespace net {
     Server::Server(unsigned short port) : DatagramSocket(port) {
         running = true;
     }
@@ -17,7 +17,7 @@ namespace net {
     void Server::Mainloop() {
         while (running) {
             Address address;
-            Packet packet(BUFFER_SIZE);
+            ServerPacket packet;
 
             cout << "Waiting for packet... ";
             int bytes = Receive(address, packet);
@@ -40,13 +40,20 @@ namespace net {
                 cout << "Client connected (" << address.ToString() << ")" << endl;
             }
 
-            cout << address.ToString() << " says: " << string(packet.GetData()) << endl;
+            packet.Process();
+            int proto = packet.GetProto();
+            int id = packet.GetId();
 
-            cout << "Sending greetings!" << endl;
-            string greetings = "Greetings!";
+            switch (proto) {
+                case GET_CONNECTED_CLIENTS: // Clients Request
+                    cout << address.ToString() << " requests clients list" << endl;
+                    Send(address, ClientsPacket(packet, clients));
+                    break;
 
-            Send(address, Packet(greetings));
-            cout << "Greetings sent" << endl;
+                default:
+                    cout << "Unkonwn protocol. Dropped" << endl;
+                    break;
+            }
         }
     }
 

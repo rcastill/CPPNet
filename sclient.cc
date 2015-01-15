@@ -2,7 +2,10 @@
 #include "include/net/core.h"
 #include "include/net/address.h"
 #include "include/net/dgsocket.h"
+#include "include/net/cpacket.h"
+#include "include/net/constants.h"
 #include "include/net/packet.h"
+#include <vector>
 
 using namespace net;
 
@@ -11,13 +14,41 @@ using namespace net;
 int main(int argc, char **argv) {
     if (NetworkInit()) {
         DatagramSocket datagramSocket;
-        //datagramSocket.SetNonBlocking();
 
         if (datagramSocket.IsBound()) {
             cout << "Socket bound at: " << datagramSocket.GetAddress().ToString() << endl;
         }
 
-        datagramSocket.Send(Address(104, 236, 36, 132, 5428), Packet("Anal"));
+        datagramSocket.Send(Address(127, 0, 0, 1, 5428), ClientsPacket());
+
+        Address address;
+        ServerPacket packet;
+
+        datagramSocket.Receive(address, packet);
+
+        packet.Process();
+
+        int proto = packet.GetProto();
+        int id = packet.GetId();
+
+        switch (proto) {
+            case GET_CONNECTED_CLIENTS: {
+                cout << "Received answer (" << id << ")" << endl;
+                ClientsPacket clientsPacket(packet);
+                cout << "clientsPacket.Process();" << endl;
+                clientsPacket.Process();
+
+                cout << clientsPacket.ToString() << endl;
+
+                break;
+            }
+
+            default:
+                cout << "Unknown protocol" << endl;
+                break;
+        }
+
+        /*datagramSocket.Send(Address(104, 236, 36, 132, 5428), Packet("Anal"));
         cout << "Sent" << endl;
 
         Address address;
@@ -40,8 +71,8 @@ int main(int argc, char **argv) {
         else {
             int bytes = datagramSocket.Receive(address, packet);
             cout << "Packet received (" << bytes << " bytes) from " << address.ToString() << endl;
-            cout << string(packet.GetData()) << endl;
-        }
+            cout << string((char *) packet.GetBuffer()) << endl;
+        }*/
 
         NetworkShutdown();
     }

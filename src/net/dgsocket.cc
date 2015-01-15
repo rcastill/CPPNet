@@ -78,19 +78,25 @@ namespace net {
         return *addr;
     }
 
-    bool DatagramSocket::Send(Address const &addr, const Packet &packet, int flags) {
+    bool DatagramSocket::Send(Address const *addr, Packet const *packet, int flags) {
         sockaddr_in address;
-        addr.Fill(address);
-        int sentBytes = sendto(fd, packet.GetData(), packet.Size(), flags, (sockaddr *) &address, sizeof(sockaddr_in));
-        return sentBytes == packet.Size();
+        addr->Fill(address);
+        char *data = (char *) packet->GetBuffer();
+        int size = packet->Size();
+        int sentBytes = sendto(fd, data, size, flags, (sockaddr *) &address, sizeof(sockaddr_in));
+        return sentBytes == packet->Size();
     }
 
-    int DatagramSocket::Receive(Address &sender, Packet &packet, int flags) {
+    bool DatagramSocket::Send(Address const &addr, const Packet &packet, int flags) {
+        return Send(&addr, &packet, flags);
+    }
+
+    int DatagramSocket::Receive(Address *sender, Packet *packet, int flags) {
         sockaddr_in from;
         socklen_t fromLength = sizeof(from);
         //char *data = new char[BUFFER_SIZE];
-        char *data = packet.GetData();
-        int size = packet.Size();
+        char *data = (char *) packet->GetBuffer();
+        int size = packet->Size();
 
         if (usecTimeout != 0) {
             fd_set rfds;
@@ -109,9 +115,13 @@ namespace net {
         if (recvBytes <= 0)
             return 0;
 
-        sender.Set(from);
+        sender->Set(from);
         //packet.SetData(data, BUFFER_SIZE);
 
         return recvBytes;
+    }
+
+    int DatagramSocket::Receive(Address &sender, Packet &packet, int flags) {
+        return Receive(&sender, &packet, flags);
     }
 }
