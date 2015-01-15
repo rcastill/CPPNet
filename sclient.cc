@@ -13,7 +13,7 @@ using namespace net;
 
 int main(int argc, char **argv) {
     if (NetworkInit()) {
-        DatagramSocket datagramSocket;
+        DatagramSocket datagramSocket(50000);
 
         if (datagramSocket.IsBound()) {
             cout << "Socket bound at: " << datagramSocket.GetAddress().ToString() << endl;
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
         int id = packet.GetId();
 
         switch (proto) {
-            case GET_CONNECTED_CLIENTS: {
+            case SERVREQ_GET_CONNECTED_CLIENTS: {
                 cout << "Received answer (" << id << ")" << endl;
                 ClientsPacket clientsPacket(packet);
                 cout << "clientsPacket.Process();" << endl;

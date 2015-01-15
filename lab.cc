@@ -5,26 +5,19 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-    ByteBuffer bb(sizeof(int) * 5);
-    Address address(127, 0, 0, 1, 59848);
+    ByteBuffer bb(BUFFER_SIZE);
 
-    cout << bb.PutInt(123) << endl;
-    cout << bb.PutInt(7520) << endl;
-    cout << bb.PutInt(8388607) << endl;
-    cout << bb.PutInt(1928951800) << endl;
-    cout << bb.PutInt(213124141) << endl;
+    string m = "MARACASAYA REPORTANDOSE PARA LA ACCION <3";
+
+    bb.PutShort((short) m.length());
+    bb.PutString(m);
 
     bb.Rewind();
 
-    for (int i = 0; i < 5; i++) {
-        int n = bb.GetInt();
-        cout << n << endl;
-    }
+    size_t len = (size_t) bb.GetShort();
+    string arrived = bb.GetString(len);
 
-    int h = 8388608;
-    u_long l = htonl((u_long) h);
-    int test = (int) (u_long) ntohl((u_long) (int) l);
-    cout << "test " << test << endl;
+    cout << arrived << " " << arrived.length() << endl;
 
     /*int helloThere[2];
 

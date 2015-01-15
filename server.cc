@@ -45,7 +45,7 @@ namespace net {
             int id = packet.GetId();
 
             switch (proto) {
-                case GET_CONNECTED_CLIENTS: // Clients Request
+                case SERVREQ_GET_CONNECTED_CLIENTS: // Clients Request
                     cout << address.ToString() << " requests clients list" << endl;
                     Send(address, ClientsPacket(packet, clients));
                     break;

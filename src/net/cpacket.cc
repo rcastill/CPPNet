@@ -14,38 +14,15 @@ namespace net {
 
         addresses = NULL;
 
-        PutInt(sp.GetProto());
-        PutInt(sp.GetId());
+        PutInt(sp.GetProto()); // Protocol
+        PutInt(sp.GetId()); // Packet ID
 
-        PutInt(addrs.size());
+        PutInt(addrs.size()); // Client count
 
-        cout << "START" << endl;
         for (int i = 0; i < addrs.size(); i++) {
-            PutInt(addrs[i].GetAddress());
-            PutShort(addrs[i].GetPort());
+            PutInt(addrs[i].GetAddress()); // Client (i) 's address
+            PutShort(addrs[i].GetPort()); // Client (i) 's port
         }
-        cout << "END" << endl;
-
-        ByteBuffer bb(buffer, cap);
-        bb.DisableDestructor();
-
-        int p = bb.GetInt();
-        int i = bb.GetInt();
-        int s = bb.GetInt();
-
-        cout << "Protocol: " << p << endl;
-        cout << "PacketID: " << i << endl;
-        cout << "Connected Count: " << s << endl;
-
-        unsigned int a;
-        unsigned short b;
-
-        for (int j = 0; j < s; j++) {
-            a = (unsigned int) bb.GetInt();
-            b = (unsigned short) bb.GetShort();
-            cout << "(" << j + 1 << ") " << a << ":" << b << endl;
-        }
-
     }
 
     /**
@@ -54,7 +31,7 @@ namespace net {
     ClientsPacket::ClientsPacket() : ServerPacket(0) {
         addresses = NULL;
 
-        proto = GET_CONNECTED_CLIENTS;
+        proto = SERVREQ_GET_CONNECTED_CLIENTS;
         id = ClientsPacket::counter++;
         PutInt(proto);
         PutInt(id);
