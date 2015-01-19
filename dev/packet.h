@@ -4,17 +4,23 @@
 #include <cstddef>
 #include <iostream>
 #include "bytebuffer.h"
+#include "address.h"
 
 namespace net {
 
     class Packet : public ByteBuffer {
+    private:
+        Address address;
+
     public:
         Packet(char *, int);
         Packet(int);
         Packet(std::string);
         Packet();
 
-        virtual void Process() = 0;
+        Address &GetAddress();
+
+        virtual void Process() {};
     };
 }
 

@@ -1,4 +1,4 @@
-#include "../../include/net/packet.h"
+#include "packet.h"
 
 namespace net {
 
@@ -11,4 +11,8 @@ namespace net {
     }
 
     Packet::Packet() : ByteBuffer() {}
+
+    Address &Packet::GetAddress() {
+        return address;
+    }
 }
