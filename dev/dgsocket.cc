@@ -98,7 +98,7 @@ namespace net {
             tv.tv_sec = 0;
             tv.tv_usec = usecTimeout;
 
-            if (select(1, &rfds, NULL, NULL, &tv) <= 0)
+            if (select(fd + 1, &rfds, NULL, NULL, &tv) <= 0)
                 return -1;
         }
 
@@ -148,7 +148,7 @@ namespace net {
             tv.tv_sec = 0;
             tv.tv_usec = usecTimeout;
 
-            if (select(1, &rfds, NULL, NULL, &tv) <= 0)
+            if (select(fd + 1, &rfds, NULL, NULL, &tv) <= 0)
                 return -1;
         }
 
