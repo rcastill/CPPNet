@@ -1,17 +1,30 @@
 #include <iostream>
-#include "include/net/core.h"
-#include "include/net/address.h"
-#include "include/net/dgsocket.h"
-#include "include/net/cpacket.h"
-#include "include/net/constants.h"
-#include "include/net/packet.h"
+#include "dev/core.h"
+#include "dev/address.h"
+#include "dev/dgsocket.h"
+#include "dev/cpacket.h"
+#include "dev/connpacket.h"
+#include "dev/constants.h"
+#include "dev/packet.h"
 #include <vector>
 
 using namespace net;
 
 #define TIMEOUT 10
+#define RUN_N_TIMES 10
+
+vector<int> ignored;
+
+bool ShouldIgnore(int i) {
+    for (int j = 0; j < ignored.size(); j++)
+        if (ignored[j] == i)
+            return true;
+
+    return false;
+}
 
 int main(int argc, char **argv) {
+
     if (NetworkInit()) {
         DatagramSocket datagramSocket(50000);
 
@@ -21,31 +34,49 @@ int main(int argc, char **argv) {
 
         datagramSocket.Send(Address(127, 0, 0, 1, 5428), ClientsPacket());
 
-        Address address;
-        ServerPacket packet;
+        for (int i = 0; i < RUN_N_TIMES; i++) {
+            Address address;
+            ServerPacket packet;
 
-        datagramSocket.Receive(address, packet);
+            datagramSocket.Receive(address, packet);
 
-        packet.Process();
+            packet.Process();
 
-        int proto = packet.GetProto();
-        int id = packet.GetId();
+            int proto = packet.GetProto();
+            int id = packet.GetId();
 
-        switch (proto) {
-            case SERVREQ_GET_CONNECTED_CLIENTS: {
-                cout << "Received answer (" << id << ")" << endl;
-                ClientsPacket clientsPacket(packet);
-                cout << "clientsPacket.Process();" << endl;
-                clientsPacket.Process();
+            switch (proto) {
+                case SERVREQ_GET_CONNECTED_CLIENTS: {
+                    cout << "Received answer (" << id << ")" << endl;
+                    ClientsPacket clientsPacket(packet);
+                    cout << "clientsPacket.Process();" << endl;
+                    clientsPacket.Process();
 
-                cout << clientsPacket.ToString() << endl;
+                    cout << clientsPacket.ToString() << endl;
 
-                break;
+                    break;
+                }
+
+                case SERVNOTF_CLIENT_CONNECTED:
+                case SERVNOTF_CLIENT_DISCONNECTED: {
+                    if (!ShouldIgnore(id)) {
+                        ConnectionPacket connectionPacket(packet);
+                        cout << connectionPacket.ToString() << endl;
+                        ServerPacket ack(SERVNOTF_ACKNOWLEDGEMENT, id);
+                        ack.GetAddress().Set(127, 0, 0, 1, 5428);
+                        datagramSocket.Send(ack);
+                        ignored.push_back(id);
+                        break;
+                    }
+
+                    else
+                        cout << "Ignoring " << id << "." << endl;
+                }
+
+                default:
+                    cout << "Unknown protocol" << endl;
+                    break;
             }
-
-            default:
-                cout << "Unknown protocol" << endl;
-                break;
         }
 
         /*datagramSocket.Send(Address(104, 236, 36, 132, 5428), Packet("Anal"));
