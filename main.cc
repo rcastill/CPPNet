@@ -1,24 +1,3 @@
-#include "include/net/core.h"
-#include "include/net/dgsocket.h"
+int main(int argc, char **argv) {
 
-using namespace std;
-
-int main() {
-    net::NetworkInit();
-
-    net::DatagramSocket datagramSocket;
-    if (!datagramSocket.IsValid())
-        cout << "Not valid" << endl;
-
-    if (!datagramSocket.IsBound())
-        cout << "Not bound" << endl;
-
-    else
-        cout << "Address: " << datagramSocket.GetAddress().ToString() << endl;
-
-    if (!datagramSocket.SetNonBlocking())
-        cout << "Could not set non blocking" << endl;
-
-    net::NetworkShutdown();
-    return 0;
 }

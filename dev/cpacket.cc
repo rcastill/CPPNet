@@ -1,4 +1,4 @@
-#include "../../include/net/cpacket.h"
+#include "cpacket.h"
 
 namespace net {
     int ClientsPacket::counter = 0;
@@ -32,7 +32,7 @@ namespace net {
         addresses = NULL;
 
         proto = SERVREQ_GET_CONNECTED_CLIENTS;
-        id = ClientsPacket::counter++;
+        id = ServerPacket::count++;
         PutInt(proto);
         PutInt(id);
     }

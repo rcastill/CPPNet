@@ -1,4 +1,4 @@
-#include "../../include/net/core.h"
+#include "core.h"
 
 namespace net {
 

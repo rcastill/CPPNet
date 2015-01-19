@@ -1,51 +1,38 @@
 #include <iostream>
-#include "include/net/bytebuffer.h"
-#include "include/net/address.h"
+#include <chrono>
+#include "dev/packet.h"
+#include "dev/bqueue.h"
+
+#if defined(WIN32)
+#include "dev/mingw.thread.h"
+#elif defined(UNIX)
+#include <thread>
+#endif
 
 using namespace std;
+using namespace net;
+
+BlockingQueue<Packet*> bq;
+void TestThread() {
+    cout << "TestThread()" << endl;
+
+    Packet &packet = *bq.Pop();
+    packet.Rewind();
+    int popped = packet.GetInt();
+    cout << "Popped: " << popped << endl;
+}
+
+inline void Wait(int ms) {
+    cout << "Wait(" << ms << ")" << endl;
+    this_thread::sleep_for(chrono::milliseconds(ms));
+}
 
 int main(int argc, char **argv) {
-    ByteBuffer bb(BUFFER_SIZE);
-
-    string m = "MARACASAYA REPORTANDOSE PARA LA ACCION <3";
-
-    bb.PutShort((short) m.length());
-    bb.PutString(m);
-
-    bb.Rewind();
-
-    size_t len = (size_t) bb.GetShort();
-    string arrived = bb.GetString(len);
-
-    cout << arrived << " " << arrived.length() << endl;
-
-    /*int helloThere[2];
-
-    ByteBuffer buff(helloThere, sizeof(helloThere));
-    buff.TakeCareOfCopies();
-    buff.DisableDestructor();
-    buff.PutInt(42);
-    buff.PutInt(5428);
-
-    buff.Rewind();
-
-    int i1 = buff.GetInt();
-    int i2 = buff.GetInt();
-
-    int *butt = (int *) buff.GetBufferCopy();
-
-    cout << i1 << " / " << butt[0] << endl;
-    cout << i2 << " / " << butt[1] << endl;
-
-    /*ByteBuffer bb(sizeof(int) * 2);
-    bb.PutInt(42);
-    bb.PutInt(5428);
-
-    int *intbuff = (int *) bb.GetBuffer();
-
-    for (int i = 0; i < 2; i++)
-        cout << intbuff[i] << endl;*/
-
-    //cout << i << " / " << s << endl;
+    thread t(TestThread);
+    Packet packet(sizeof(int));
+    packet.PutInt(42);
+    Wait(5000);
+    bq.Push(&packet);
+    t.join();
     return 0;
 }

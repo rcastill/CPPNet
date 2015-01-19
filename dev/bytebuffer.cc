@@ -1,4 +1,4 @@
-#include "../../include/net/bytebuffer.h"
+#include "bytebuffer.h"
 
 
 template <class T> bool PutNonFloating(ByteBuffer *, T);
