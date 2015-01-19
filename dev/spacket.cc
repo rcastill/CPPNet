@@ -1,7 +1,16 @@
-#include "../../include/net/spacket.h"
+#include "spacket.h"
 
 namespace net {
     int ServerPacket::BYTES = sizeof(int) * 2;
+    int ServerPacket::count = 0;
+
+    ServerPacket::ServerPacket(int proto, int id) : Packet(BYTES) {
+        this->proto = proto;
+        this->id = id;
+
+        PutInt(proto);
+        PutInt(id);
+    }
 
     ServerPacket::ServerPacket(int cap) : Packet(BYTES + cap) {}
 

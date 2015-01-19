@@ -11,7 +11,9 @@ namespace net {
 
     public:
         static int BYTES;
+        static int count;
 
+        ServerPacket(int, int);
         ServerPacket(int);
         ServerPacket();
         void Process();
