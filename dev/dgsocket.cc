@@ -1,4 +1,4 @@
-#include "../../include/net/dgsocket.h"
+#include "dgsocket.h"
 
 namespace net {
     DatagramSocket::DatagramSocket(unsigned short port) {
@@ -76,6 +76,51 @@ namespace net {
 
     const Address &DatagramSocket::GetAddress() {
         return *addr;
+    }
+
+    bool DatagramSocket::Send(Packet *packet, int flags) {
+        sockaddr_in address;
+        packet->GetAddress().Fill(address);
+        char *data = (char *) packet->GetBuffer();
+        int size = packet->Size();
+        int sentBytes = sendto(fd, data, size, flags, (sockaddr *) &address, sizeof(sockaddr_in));
+        return sentBytes == packet->Size();
+    }
+
+    int DatagramSocket::Receive(Packet *packet, int flags) {
+        sockaddr_in from;
+        socklen_t fromLength = sizeof(from);
+        char *data = (char *) packet->GetBuffer();
+        int size = packet->Size();
+
+        if (usecTimeout != 0) {
+            fd_set rfds;
+            timeval tv;
+            FD_ZERO(&rfds);
+            FD_SET(fd, &rfds);
+            tv.tv_sec = 0;
+            tv.tv_usec = usecTimeout;
+
+            if (select(1, &rfds, NULL, NULL, &tv) <= 0)
+                return -1;
+        }
+
+        int recvBytes = recvfrom(fd, data, size, flags, (sockaddr *) &from, &fromLength);
+
+        if (recvBytes <= 0)
+            return 0;
+
+        packet->GetAddress().Set(from);
+
+        return recvBytes;
+    }
+
+    bool DatagramSocket::Send(Packet &packet, int flags) {
+        return Send(&packet, flags);
+    }
+
+    int DatagramSocket::Receive(Packet &packet, int flags) {
+        return Receive(&packet, flags);
     }
 
     bool DatagramSocket::Send(Address const *addr, Packet const *packet, int flags) {
