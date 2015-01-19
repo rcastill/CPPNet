@@ -1,8 +1,6 @@
 #include "cpacket.h"
 
 namespace net {
-    int ClientsPacket::counter = 0;
-
     ClientsPacket::ClientsPacket(ServerPacket &sp) {
         proto = sp.GetProto();
         id = sp.GetId();

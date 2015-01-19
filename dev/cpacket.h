@@ -11,21 +11,34 @@
 namespace net {
     class ClientsPacket : public ServerPacket {
     private:
-        Address *addresses;
-        int ccount;
-        static int counter;
+        Address *addresses; // Addresses array
+        int ccount;         // Addresses count
 
     public:
-        ClientsPacket(ServerPacket &);
-        ClientsPacket(const ServerPacket &, const vector<Address> &);
-        ClientsPacket(); // Initialize as request
+        // Constructs clients packet from ServerPacket buffer
+        ClientsPacket(ServerPacket &sp);
+
+        /* Constructs answer to SERVREQ_GET_CONNECTED_CLIENTS request.
+           sp is used for match request id, and addrs is the container
+           of the connected clients, the data is serialized and sent */
+        ClientsPacket(const ServerPacket &sp, const vector<Address> &addrs);
+
+        // Initialize as request
+        ClientsPacket();
+
+        // delete[] addresses;
         ~ClientsPacket();
 
+        // Fills addresses and ccount from ServerPacket buffer
         void Process();
 
+        // Connected clients list size
         int ClientCount() const;
+
+        // Access elements of the array
         const Address &operator[] (const int);
 
+        // Represents address array
         string ToString() const;
     };
 }

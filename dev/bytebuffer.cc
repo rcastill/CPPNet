@@ -79,12 +79,12 @@ void ByteBuffer::TakeCareOfCopies() {
     copies = new vector<char *>;
 }
 
-void ByteBuffer::Pointer(int ptr) {
+void ByteBuffer::SetCurrentPosition(int ptr) {
     if (ptr < cap && ptr >= 0)
         this->ptr = ptr;
 }
 
-int ByteBuffer::Pointer() {
+int ByteBuffer::GetCurrentPosition() {
     return ptr;
 }
 

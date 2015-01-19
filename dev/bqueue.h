@@ -3,6 +3,7 @@
 
 #include <queue>
 
+/* Conccurrent synch tools */
 #if defined(WIN32)
 #include "mingw.thread.h"
 #include <mutex>
@@ -16,6 +17,8 @@
 
 using namespace std;
 
+/* Java-inspired for handling exception when
+   interrupted. */
 class InterruptedException : public exception {
 public:
     const char *what() const throw() {
@@ -23,26 +26,48 @@ public:
     }
 };
 
+/* Eventually this implementation will be separated in .h/.cc files
+   but for now (bussy with something else than damn templates (: )
+   it will remain still */
+
+/* Concurrent queue<> implementation. It supports concurrent
+   addition of elements, and blocking behavior when popping. */
+
 template <class T>
 class BlockingQueue {
 private:
-    queue<T> q;
-    mutex mtx;
-    condition_variable cv;
+    queue<T> q;             // Non-Concurrent queue
+    mutex mtx;              // POSIX mutex
+    condition_variable cv;  // CV
 
-    bool interrupted;
+    bool interrupted;       // Interrupt state
 public:
 
+    // Default ctor
     BlockingQueue();
 
+    /* Interrupts concurrent operations. (e.g if popping
+       an element and .Interrupt() gets called, a InterruptedException
+       is thrown) */
     void Interrupt();
+
+    // Retrieves interrupt status
     bool IsInterrupted();
+
+    // Pushes element to queue
     void Push(const T &);
+
+    // Pops and returns front element from queue
     T Pop() throw(int);
 
+    /* Instruction iterator: ins is called with each
+       element as argument */
     void Doit(function<void(T&)> ins);
+
+    // Wipes queue
     void Clear();
 
+    // queue's size
     size_t Size() const;
 };
 

@@ -21,15 +21,15 @@ typedef int socklen_t;
 #include <unistd.h>
 #endif
 
-const int BUFFER_SIZE = 256;
+const int BUFFER_SIZE = 256;    // MAX_PACKET_SIZE
 
 #include <iostream>
 using namespace std;
 
 namespace net {
-    bool NetworkInit();
-    void NetworkShutdown();
-    void Wait(float);
+    bool NetworkInit();     // Inits WSA (Windows only, in linux it does nothing)
+    void NetworkShutdown(); // Shuts down WSA (Windows onlu, in linux it does nothing)
+    void Wait(float s);     // Waits for s seconds
 }
 
 #endif

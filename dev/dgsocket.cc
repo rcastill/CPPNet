@@ -29,10 +29,7 @@ namespace net {
         #elif PLATFORM == PLATFORM_UNIX
         close(fd);
         #endif
-    }
-
-    DatagramSocket &DatagramSocket::New(unsigned short port) {
-        return *(new DatagramSocket(port));
+        delete addr;
     }
 
     bool DatagramSocket::IsValid() const {

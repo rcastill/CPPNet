@@ -1,62 +1,133 @@
 #ifndef NETBYTEBUFFER_H
 #define NETBYTEBUFFER_H
 
-#include "core.h"
-#include <cstring>
+#include "core.h"   // ntoh* / hton* functions
+#include <cstring>  // memcpy
 #include <vector>
 
 using namespace std;
 
+/* Byte buffer designed for network operations. */
 class ByteBuffer {
 protected:
-    char *buffer;
-    int ptr, cap;
-    bool shouldClean;
-    vector<char *> *copies;
+    char *buffer;           // Base buffer
+    int ptr, cap;           // current position, buffer size
+    bool shouldClean;       // indicates whether should apply delete[] buffer on destructor
+    vector<char *> *copies; // Mantains track of copies if told so
 
 public:
-    ByteBuffer(int);
-    ByteBuffer(void *, int);
+    // Allocates heap for cap bytes
+    ByteBuffer(int cap);
+
+    // Passes buffer and its size
+    ByteBuffer(void *buffer, int cap);
+
+    // Default ctor. Initializes all variables.
     ByteBuffer();
+
+    /* Applies delete[] on heap if shouldClean
+       and on copies if is thy are being tracked */
     virtual ~ByteBuffer();
 
-    void Transfer(ByteBuffer *);
-    void Transfer(ByteBuffer &);
+    /* Transfers buffer and configuration to
+       other ByteBuffer (moves data) */
+    void Transfer(ByteBuffer *other);
+    void Transfer(ByteBuffer &other);
+
+    // shouldClean = false;
     void DisableDestructor();
+
+    // Keeps track of copies
     void TakeCareOfCopies();
 
+    // Gets buffer as void*
     void *GetBuffer() const;
-    void *GetBufferCopy();
-    char &operator[](const unsigned int);
 
-    bool Put(char);
-    bool Put(char, int);
-    bool PutShort(short);
-    bool PutShort(short, int);
-    bool PutInt(int);
-    bool PutInt(int, int);
-    bool PutLong(long);
-    bool PutLong(long, int);
+    // A copy of the buffer is returned
+    void *GetBufferCopy();
+
+    // Direct reference access to buffer byte
+    char &operator[](const unsigned int i);
+
+    /* All Put/Get methods that imply current position
+       increments it depending on the data size. And in
+       opposite absolute position methods leaves the
+       current position untouched */
+
+    // Puts byte on current position
+    bool Put(char c);
+
+    // Puts byte on absolute position
+    bool Put(char c, int cptr);
+
+    // Puts short on current position
+    bool PutShort(short s);
+
+    // Puts short on absolute position
+    bool PutShort(short s, int cptr);
+
+    // Puts int on current position
+    bool PutInt(int i);
+
+    // Puts int on absolute position
+    bool PutInt(int i, int cptr);
+
+    // Puts long on current position
+    bool PutLong(long l);
+
+    // Puts long on absolute position
+    bool PutLong(long l, int cptr);
+
+    // Puts string on current position
     bool PutString(string);
+
+    // Puts string on absolute position
     bool PutString(string, int);
 
+    // Gets byte from current position
     char Get();
-    char Get(int);
+
+    // Gets byte from absolute position (similar to [])
+    char Get(int cptr);
+
+    // Gets short from current position
     short GetShort();
-    short GetShort(int);
+
+    // Gets short from absolute position
+    short GetShort(int cptr);
+
+    // Gets int from current postion
     int GetInt();
-    int GetInt(int);
+
+    // Gets int from absolute position
+    int GetInt(int cptr);
+
+    // Gets long from current position
     long GetLong();
-    long GetLong(int);
-    string GetString(size_t);
+
+    // Gets long from absolute position
+    long GetLong(int cptr);
+
+    // Gets n bytes as string from current position
+    string GetString(size_t n);
+
+    // Gets n bytes as string from absolute position
     string GetString(size_t, int);
 
-    bool Fits(int);
+    // Tells wether <bytes> bytes fit in buffer
+    bool Fits(int bytes);
+
+    // Shrinks buffer size to current position
     void ShrinkToFit();
 
+    // Buffer capacity
     int Size() const;
-    int Pointer();
-    void Pointer(int);
+
+    // ptr getter/setter
+    int GetCurrentPosition();
+    void SetCurrentPosition(int);
+
+    // Resets current position to 0
     void Rewind();
 };
 
