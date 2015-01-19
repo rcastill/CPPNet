@@ -257,7 +257,7 @@ int main(int argc, char **argv) {
 
     if (net::NetworkInit()) {
         net::Server server(port);
-        server.EnableThreadingModel();
+        //server.EnableThreadingModel();
 
         if (server.IsValid() && server.IsBound()) {
             cout << "Server bound @ " << server.GetAddress().ToString() << endl;

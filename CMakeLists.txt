@@ -15,7 +15,7 @@ add_library(ClientsPacket dev/cpacket.cc)
 add_library(ConnectionPacket dev/connpacket.cc)
 
 target_link_libraries(DatagramSocket Address Packet ByteBuffer)
-target_link_libraries(Packet ByteBuffer)
+target_link_libraries(Packet ByteBuffer Address)
 target_link_libraries(ServerPacket Packet)
 
 set(SOURCE_FILES main.cc)
@@ -41,7 +41,6 @@ add_definitions(-DWIN32)
 endif()
 
 if(UNIX)
+target_link_libraries(Server pthread)
 add_definitions(-DUNIX)
 endif()
-
-add_definitions(-std=c++11)
