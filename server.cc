@@ -1,3 +1,5 @@
+// TODO ACK CLIENT DEPENDENT
+
 #include "server.h"
 
 #if PLATFORM == PLATFORM_WINDOWS
@@ -220,9 +222,8 @@ namespace net {
                 case SERVNOTF_ACKNOWLEDGEMENT:
                     cout << "Received notification ACK (" << id << "). ";
 
-                    if (IsPendant(id)) {
+                    if (IsPendant(id))
                         pendant.remove(id);
-                    }
 
                     else
                         cout << "Dropped.";
