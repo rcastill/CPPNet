@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
         }
 
         datagramSocket.Send(Address(104, 236, 36, 132, 5428), ClientsPacket());
+        //datagramSocket.Send(Address(127, 0, 0, 1, 5428), ClientsPacket());
 
         for (int i = 0; i < RUN_N_TIMES; i++) {
             Address address;
@@ -62,15 +63,18 @@ int main(int argc, char **argv) {
                     if (!ShouldIgnore(id)) {
                         ConnectionPacket connectionPacket(packet);
                         cout << connectionPacket.ToString() << endl;
-                        ServerPacket ack(SERVNOTF_ACKNOWLEDGEMENT, id);
-                        ack.GetAddress().Set(127, 0, 0, 1, 5428);
-                        datagramSocket.Send(ack);
                         ignored.push_back(id);
-                        break;
                     }
 
                     else
                         cout << "Ignoring " << id << "." << endl;
+
+                    ServerPacket ack(SERVNOTF_ACKNOWLEDGEMENT, id);
+                    //ack.GetAddress().Set(127, 0, 0, 1, 5428);
+                    ack.GetAddress().Set(104, 236, 36, 132, 5428);
+                    datagramSocket.Send(ack);
+
+                    break;
                 }
 
                 default:
