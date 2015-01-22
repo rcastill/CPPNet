@@ -36,10 +36,15 @@ namespace net {
 
         void ProcessACK(int ack) {
             if (!ShouldIgnore(ack)) {
+                cout << "ACK being processed by " << ToString() << endl;
                 ignore.push_back(ack);
+
+                cout << "Current counter: " << pendantMAP[ack] << endl;
 
                 if (--pendantMAP[ack] == 0)
                     ignore.remove(ack);
+
+                cout << "New value: " << pendantMAP[ack] << endl;
             }
         }
     };
@@ -261,6 +266,7 @@ namespace net {
                 ConnectionPacket *connectionPacket = new ConnectionPacket(client, true);
                 //pendant.push_back(connectionPacket->GetId());
                 pendantMAP[connectionPacket->GetId()] = (int) clients.size();
+                cout << "Set as pendant ID=" << connectionPacket->GetId() << " with counter=" << clients.size() << "." << endl;
                 commonQueue.Push(connectionPacket);
             }
 
@@ -285,6 +291,8 @@ namespace net {
                                 break;
                             }
                         }
+
+                        cout << "Could not find client." << endl;
                     }
 
                     else
