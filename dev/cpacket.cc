@@ -40,7 +40,10 @@ namespace net {
         for (int i = 0; i < addrs.size(); i++) {
             PutInt(addrs[i].GetAddress());
             PutInt(addrs[i].GetPort());
-            cout << "(" << i << " | " << addrs[i].GetAddress() << " | " << addrs[i].GetPort() << ")" << endl;
+            SetCurrentPosition((int) (GetCurrentPosition() - sizeof(int) * 2));
+            unsigned int ADDRESS = (unsigned int) GetInt();
+            unsigned int PORT = (unsigned int) GetShort();
+            cout << "(" << i << " | " << ADDRESS << " | " << PORT << ")" << endl;
         }
 
     }
