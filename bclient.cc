@@ -23,7 +23,7 @@ void BackendClient::Process(ServerPacket &packet) {
         }
 
         case SERVNOTF_ACKNOWLEDGEMENT: {
-            cout << "Received notification ACK (" << id << "). ";
+            cout << ToString() << " received notification ACK (" << id << "). ";
 
             if (IsPendant(id))
                 pendant.remove(id);

@@ -11,6 +11,9 @@ using namespace net;
 
 vector<int> ignored;
 
+Address serverAddress(127, 0, 0, 1, 5428);
+//Address serverAddress(104, 236, 36, 132, 5428);
+
 bool ShouldIgnore(int i) {
     for (int j = 0; j < ignored.size(); j++)
         if (ignored[j] == i)
@@ -28,10 +31,9 @@ int main(int argc, char **argv) {
             cout << "Socket bound at: " << datagramSocket.GetAddress().ToString() << endl;
         }
 
-        datagramSocket.Send(Address(104, 236, 36, 132, 5428), ClientsPacket());
-        //datagramSocket.Send(Address(127, 0, 0, 1, 5428), ClientsPacket());
+        datagramSocket.Send(serverAddress, ClientsPacket());
 
-        for (int i = 0; i < RUN_N_TIMES; i++) {
+        for (int i = 0; i < i + 1; i++) {
             Address address;
             ServerPacket packet;
 
@@ -66,8 +68,7 @@ int main(int argc, char **argv) {
                         cout << "Ignoring " << id << "." << endl;
 
                     ServerPacket ack(SERVNOTF_ACKNOWLEDGEMENT, id);
-                    //ack.GetAddress().Set(127, 0, 0, 1, 5428);
-                    ack.GetAddress().Set(104, 236, 36, 132, 5428);
+                    ack.GetAddress().Set(serverAddress);
                     datagramSocket.Send(ack);
 
                     break;

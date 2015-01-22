@@ -174,7 +174,7 @@ namespace net {
                 cout << "Waiting for packet... ";
 
             else
-                cout << "Looking for incoming packet...";
+                cout << "Looking for incoming packet... ";
 
             int bytes = Receive(packet);
 
@@ -185,6 +185,10 @@ namespace net {
 
             if (bytes == -1) {
                 cout << "Timeout!" << endl;
+
+                if (!usingThreads)
+                    while (SendPendant(this));
+
                 continue;
             }
 

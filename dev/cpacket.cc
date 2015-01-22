@@ -39,11 +39,7 @@ namespace net {
 
         for (int i = 0; i < addrs.size(); i++) {
             PutInt(addrs[i].GetAddress());
-            PutInt(addrs[i].GetPort());
-            SetCurrentPosition((int) (GetCurrentPosition() - sizeof(int) * 2));
-            unsigned int ADDRESS = (unsigned int) GetInt();
-            unsigned int PORT = (unsigned int) GetShort();
-            cout << "(" << i << " | " << ADDRESS << " | " << PORT << ")" << endl;
+            PutShort(addrs[i].GetPort());
         }
 
     }
@@ -91,8 +87,6 @@ namespace net {
         for (int i = 0; i < ccount; i++) {
             unsigned int address = (unsigned int) GetInt();
             unsigned short port = (unsigned short) GetShort();
-
-            cout << "(" << i << " | " << address << " | " << port << ")" << endl;
 
             addresses[i].Set(address, port);
         }
