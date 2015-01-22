@@ -7,7 +7,7 @@
 
 using namespace net;
 
-#define RUN_N_TIMES 10
+#define RUN_N_TIMES 100
 
 vector<int> ignored;
 
