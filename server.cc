@@ -191,12 +191,12 @@ namespace net {
             cout << "Received " << bytes << " bytes." << endl;
 
             Address &address = packet.GetAddress();
-            BackendClient *client;
+            BackendClient *client = NULL;
 
             unsigned int i;
             for (i = 0; i < clients.size(); i++)
                 if (clients[i] == address) {
-                    client = &client[i];
+                    client = &clients[i];
                     break;
                 }
 
