@@ -4,13 +4,9 @@
 #include "dev/dgsocket.h"
 #include "dev/cpacket.h"
 #include "dev/connpacket.h"
-#include "dev/constants.h"
-#include "dev/packet.h"
-#include <vector>
 
 using namespace net;
 
-#define TIMEOUT 10
 #define RUN_N_TIMES 10
 
 vector<int> ignored;
@@ -32,8 +28,8 @@ int main(int argc, char **argv) {
             cout << "Socket bound at: " << datagramSocket.GetAddress().ToString() << endl;
         }
 
-        datagramSocket.Send(Address(104, 236, 36, 132, 5428), ClientsPacket());
-        //datagramSocket.Send(Address(127, 0, 0, 1, 5428), ClientsPacket());
+        //datagramSocket.Send(Address(104, 236, 36, 132, 5428), ClientsPacket());
+        datagramSocket.Send(Address(127, 0, 0, 1, 5428), ClientsPacket());
 
         for (int i = 0; i < RUN_N_TIMES; i++) {
             Address address;
