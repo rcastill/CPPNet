@@ -1,3 +1,4 @@
+#include <monetary.h>
 #include "dgsocket.h"
 
 namespace net {
@@ -80,7 +81,7 @@ namespace net {
         packet->GetAddress().Fill(address);
         char *data = (char *) packet->GetBuffer();
         int size = packet->Size();
-        int sentBytes = sendto(fd, data, size, flags, (sockaddr *) &address, sizeof(sockaddr_in));
+        ssize_t sentBytes = sendto(fd, data, (size_t) size, flags, (sockaddr *) &address, sizeof(sockaddr_in));
         return sentBytes == packet->Size();
     }
 

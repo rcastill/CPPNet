@@ -27,19 +27,20 @@ namespace net {
         }
     }
 
-    ClientsPacket::ClientsPacket(const ServerPacket &sp, const vector<BackendClient> &addrs) :
-            ServerPacket(sizeof(int) + addrs.size() * Address::BYTES) {
+    ClientsPacket::ClientsPacket(const ServerPacket &sp, vector<BackendClient> &addrs) :
+            ServerPacket((int) (sizeof(int) + addrs.size() * Address::BYTES)) {
 
         addresses = NULL;
 
         PutInt(sp.GetProto());
         PutInt(sp.GetId());
 
-        PutInt(addrs.size());
+        PutInt((int) addrs.size());
 
         for (int i = 0; i < addrs.size(); i++) {
             PutInt(addrs[i].GetAddress());
             PutInt(addrs[i].GetPort());
+            cout << "(" << i << " | " << addrs[i].GetAddress() << " | " << addrs[i].GetPort() << ")" << endl;
         }
 
     }
@@ -87,6 +88,8 @@ namespace net {
         for (int i = 0; i < ccount; i++) {
             unsigned int address = (unsigned int) GetInt();
             unsigned short port = (unsigned short) GetShort();
+
+            cout << "(" << i << " | " << address << " | " << port << ")" << endl;
 
             addresses[i].Set(address, port);
         }

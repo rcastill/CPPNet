@@ -2,11 +2,11 @@
 
 #include "server.h"
 
-BackendClient::BackendClient(Address &address, Server *server) : Address(address), brothers(server->GetClients()) {
+BackendClient::BackendClient(const Address &address, Server *server) : Address(address), brothers(server->GetClients()) {
     this->server = server;
 }
 
-BackendClient::BackendClient(Address &address, Server &server) : BackendClient(address, &server) {}
+//BackendClient::BackendClient(const Address &address, Server &server) : BackendClient(address, &server) {}
 
 void BackendClient::Process(ServerPacket &packet) {
     packet.Process();

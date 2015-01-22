@@ -21,8 +21,8 @@ private:
     list<int> pendant;
 
 public:
-    BackendClient(Address &address, Server *server);
-    BackendClient(Address &address, Server &server);
+    BackendClient(const Address &address, Server *server);
+    BackendClient(const Address &address, Server &server);
 
     void Process(ServerPacket &sp);
     bool IsPendant(int id);
