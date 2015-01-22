@@ -208,10 +208,10 @@ namespace net {
                 cout << "Client connected (" << address.ToString() << ")" << endl;
 
                 ConnectionPacket *connectionPacket = new ConnectionPacket(address, true);
+.
 
                 for (i = 0; i < clients.size(); i++)
-                    clients[i].SetPendant(connectionPacket->..
-                            GetId());
+                    clients[i].SetPendant(connectionPacket->GetId());
 
                 commonQueue.Push(connectionPacket);
             }
