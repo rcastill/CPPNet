@@ -1,4 +1,3 @@
-#include <regexp.h>
 #include "cpacket.h"
 
 namespace net {
