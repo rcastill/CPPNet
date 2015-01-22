@@ -27,6 +27,23 @@ namespace net {
         }
     }
 
+    ClientsPacket::ClientsPacket(const ServerPacket &sp, const vector<BackendClient> &addrs) :
+            ServerPacket(sizeof(int) + addrs.size() * Address::BYTES) {
+
+        addresses = NULL;
+
+        PutInt(sp.GetProto());
+        PutInt(sp.GetId());
+
+        PutInt(addrs.size());
+
+        for (int i = 0; i < addrs.size(); i++) {
+            PutInt(addrs[i].GetAddress());
+            PutInt(addrs[i].GetPort());
+        }
+
+    }
+
     ClientsPacket::ClientsPacket(const ServerPacket &sp, vector<Address> &addrs) :
             ServerPacket(sizeof(int) + addrs.size() * Address::BYTES) {
 

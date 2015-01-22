@@ -13,10 +13,12 @@ add_library(Packet dev/packet.cc)
 add_library(ServerPacket dev/spacket.cc)
 add_library(ClientsPacket dev/cpacket.cc)
 add_library(ConnectionPacket dev/connpacket.cc)
+add_library(BackendClient bclient.cc)
 
 target_link_libraries(DatagramSocket Address Packet ByteBuffer)
 target_link_libraries(Packet ByteBuffer Address)
 target_link_libraries(ServerPacket Packet)
+target_link_libraries(BackendClient ClientsPacket)
 
 set(SOURCE_FILES main.cc)
 add_executable(CPPNet ${SOURCE_FILES})
@@ -26,7 +28,7 @@ add_executable(Lab lab.cc)
 
 target_link_libraries(CPPNet NetCore DatagramSocket)
 target_link_libraries(SClient NetCore DatagramSocket ClientsPacket ServerPacket ConnectionPacket)
-target_link_libraries(Server DatagramSocket Address Packet NetCore ServerPacket ClientsPacket ConnectionPacket)
+target_link_libraries(Server DatagramSocket Address Packet NetCore ServerPacket ClientsPacket ConnectionPacket BackendClient)
 target_link_libraries(Lab ByteBuffer Address Packet)
 
 #add_definitions(-DINCLUDE_ADITIONAL_MUTEX) // makes scoped_guard, unique_lock, etc, available in mutex

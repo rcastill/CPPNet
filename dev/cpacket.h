@@ -7,6 +7,7 @@
 #include "address.h"
 #include "constants.h"
 #include <vector>
+#include "../bclient.h"
 
 namespace net {
     class ClientsPacket : public ServerPacket {
@@ -19,6 +20,8 @@ namespace net {
         ClientsPacket(ServerPacket &sp);
 
         ClientsPacket(const ServerPacket &sp, void *hybaddrs, int step, size_t size);
+
+        ClientsPacket(const ServerPacket &sp, const vector<BackendClient> &addrs);
 
         /* Constructs answer to SERVREQ_GET_CONNECTED_CLIENTS request.
            sp is used for match request id, and addrs is the container

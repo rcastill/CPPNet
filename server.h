@@ -16,14 +16,15 @@
 #include "dev/connpacket.h"
 #include "dev/constants.h"
 #include "dev/bqueue.h"
+#include "bclient.h"
 
 using namespace std;
 
 namespace net {
     class Server : public DatagramSocket {
     private:
-        //vector<Address> clients;    // Connected clients collection
-        bool running;               // Server state
+        vector<BackendClient> clients;  // Connected clients collection
+        bool running;                   // Server state
 
     public:
         // Parent-Matching ctor (auto allocated port by default)
@@ -40,7 +41,7 @@ namespace net {
         void EnableThreadingModel();
 
         // Gets connected clients collection
-        //vector<Address>&GetClients();
+        vector<BackendClient>&GetClients();
 
         // Tells server state
         bool IsRunning() const;
