@@ -109,10 +109,11 @@ namespace net {
                     pendantCount++;
                 }
 
-            packet->GetAddress().Clear();
 
-            if (pendantCount)
+            if (pendantCount) {
+                packet->GetAddress().Clear();
                 commonQueue.Push(packet);
+            }
 
             else // avoid memory leak
                 delete packet;
@@ -189,20 +190,28 @@ namespace net {
 
             cout << "Received " << bytes << " bytes." << endl;
 
-            BackendClient client(packet.GetAddress(), this);
+            Address &address = packet.GetAddress();
+            BackendClient *client;
 
             unsigned int i;
             for (i = 0; i < clients.size(); i++)
-                if (clients[i] == client) break;
+                if (clients[i] == address) {
+                    client = &client[i];
+                    break;
+                }
 
             if (i == clients.size()) {
-                clients.push_back(client);
-                cout << "Client connected (" << client.ToString() << ")" << endl;
+                clients.push_back(BackendClient(address, this));
 
-                ConnectionPacket *connectionPacket = new ConnectionPacket(client, true);
+                client = &clients.back();
+
+                cout << "Client connected (" << address.ToString() << ")" << endl;
+
+                ConnectionPacket *connectionPacket = new ConnectionPacket(address, true);
 
                 for (i = 0; i < clients.size(); i++)
-                    clients[i].SetPendant(connectionPacket->GetId());
+                    clients[i].SetPendant(connectionPacket->..
+                            GetId());
 
                 commonQueue.Push(connectionPacket);
             }
@@ -210,7 +219,7 @@ namespace net {
             if (!usingThreads)
                 while (SendPendant(this));
 
-            client.Process(packet);
+            client->Process(packet);
         }
 
     }
