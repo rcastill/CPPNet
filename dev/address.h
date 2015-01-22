@@ -24,6 +24,9 @@ public:
     // sockaddr_in ctor, uses addr.sin_addr.s_addr and addr.sin_port
     Address(const sockaddr_in &addr);
 
+    // copy ctor
+    Address(const Address &other);
+
     // Default constructor, initializes fields to 0
     Address();
 

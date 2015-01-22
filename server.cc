@@ -13,8 +13,38 @@ namespace net {
     BlockingQueue<ServerPacket*> bsqueue;
     queue<ServerPacket*> squeue;
 
-    list<int> pendant;
+    //list<int> pendant;
+    map<int, int> pendantMAP;
+
     thread sthread;
+
+    class ACKManager : public Address {
+    private:
+        list<int> ignore;
+
+        bool ShouldIgnore(int ack) {
+            list<int>::iterator it;
+
+            for (it = ignore.begin(); it != ignore.end(); it++)
+                if (ack == *it) return true;
+
+            return false;
+        }
+
+    public:
+        ACKManager(const Address &other) : Address(other) {}
+
+        void ProcessACK(int ack) {
+            if (!ShouldIgnore(ack)) {
+                ignore.push_back(ack);
+
+                if (--pendantMAP[ack] == 0)
+                    ignore.remove(ack);
+            }
+        }
+    };
+
+    vector<ACKManager> clients;
 
     struct CommonQueue {
     private:
@@ -69,30 +99,49 @@ namespace net {
                 return NULL;
             }
 
+            return NULL;
         }
 
-        int Size() {
+        size_t Size() {
             if (bq != NULL)
                 return bq->Size();
 
             else if (q != NULL)
                 return q->size();
+
+            return 0;
         }
     } commonQueue;
 
-    bool IsPendant(int n) {
+    /*bool IsPendant(int n) {
         list<int>::iterator it;
 
         for (it = pendant.begin(); it != pendant.end(); it++)
             if (*it == n) return true;
 
         return false;
+    }*/
+
+    bool IsPendantMAP(int n) {
+        map<int, int>::iterator it;
+
+        for (it = pendantMAP.begin(); it != pendantMAP.end(); it++)
+            if (it->first == n) return true;
+
+        return false;
+    }
+
+    void IncrementPendantCounters() {
+        map<int, int>::iterator it;
+
+        for (it = pendantMAP.begin(); it != pendantMAP.end(); it++)
+            it->second++;
     }
 
     bool SendPendant(Server *server) {
         do {
-            static int size = commonQueue.Size();
-            static int counter = 0;
+            static size_t size = commonQueue.Size();
+            static size_t counter = 0;
 
             ServerPacket *packet;
 
@@ -106,8 +155,8 @@ namespace net {
             if (packet == NULL)
                 return false;
 
-            if (IsPendant(packet->GetId())) {                       // If packet ID is on pendant vector
-                vector<Address> &clients = server->GetClients();    // Gets dests
+            if (IsPendantMAP(packet->GetId())) {                       // If packet ID is on pendant vector
+                //vector<Address> &clients = server->GetClients();    // Gets dests
 
                 for (int i = 0; i < clients.size(); i++) {
                     packet->GetAddress().Set(clients[i]);           // Set each dest
@@ -125,6 +174,7 @@ namespace net {
                 counter = 0;
                 return false;
             }
+
         } while (server->IsRunning() && usingThreads);
 
         return true;
@@ -153,9 +203,9 @@ namespace net {
         }
     }
 
-    vector<Address>& Server::GetClients() {
+    /*vector<Address>& Server::GetClients() {
         return clients;
-    }
+    }*/
 
     bool Server::IsRunning() const {
         return running;
@@ -193,21 +243,26 @@ namespace net {
             cout << "Received " << bytes << " bytes." << endl;
 
 
-            Address &address = packet.GetAddress();
+            //Address &address = packet.GetAddress();
+            //ACKManager ackManager(address);
+            ACKManager client(packet.GetAddress());
 
             unsigned int i;
             for (i = 0; i < clients.size(); i++)
-                if (clients[i] == address) break;
+                if (clients[i] == client) break;
 
             if (i == clients.size()) {
-                clients.push_back(address);
-                cout << "Client connected (" << address.ToString() << ")" << endl;
+                clients.push_back(client);
+                //clients.push_back(ackManager);
+                cout << "Client connected (" << client.ToString() << ")" << endl;
 
-                ConnectionPacket *connectionPacket = new ConnectionPacket(address, true);
-                pendant.push_back(connectionPacket->GetId());
+                IncrementPendantCounters();
+
+                ConnectionPacket *connectionPacket = new ConnectionPacket(client, true);
+                //pendant.push_back(connectionPacket->GetId());
+                pendantMAP[connectionPacket->GetId()] = (int) clients.size();
                 commonQueue.Push(connectionPacket);
             }
-
 
             packet.Process();
             int proto = packet.GetProto();
@@ -215,18 +270,28 @@ namespace net {
 
             switch (proto) {
                 case SERVREQ_GET_CONNECTED_CLIENTS: // Clients Request
-                    cout << address.ToString() << " requests clients list." << endl;
-                    Send(address, ClientsPacket(packet, clients));
+                    cout << client.ToString() << " requests clients list." << endl;
+                    Send(client, ClientsPacket(packet, &clients[0], sizeof(ACKManager), clients.size()));
                     break;
 
                 case SERVNOTF_ACKNOWLEDGEMENT:
                     cout << "Received notification ACK (" << id << "). ";
 
-                    if (IsPendant(id))
-                        pendant.remove(id);
+                    if (IsPendantMAP(id)) {
+                        for (i = 0; i < clients.size(); i++) {
+                            if (clients[i] == client) {
+                                ACKManager &m = clients[i];
+                                m.ProcessACK(id);
+                                break;
+                            }
+                        }
+                    }
 
                     else
                         cout << "Dropped.";
+
+                    //if (IsPendant(id))
+                    //    pendant.remove(id);
 
                     cout << endl;
                     break;

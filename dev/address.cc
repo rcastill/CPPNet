@@ -14,6 +14,11 @@ Address::Address(const sockaddr_in &addr) {
     Set(addr);
 }
 
+Address::Address(const Address &other) {
+    address = other.address;
+    port = other.port;
+}
+
 Address::Address() {
     Clear();
 }

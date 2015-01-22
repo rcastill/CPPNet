@@ -1,3 +1,4 @@
+#include <regexp.h>
 #include "cpacket.h"
 
 namespace net {
@@ -7,7 +8,27 @@ namespace net {
         sp.Transfer(this);
     }
 
-    ClientsPacket::ClientsPacket(const ServerPacket &sp, const vector<Address> &addrs) :
+    ClientsPacket::ClientsPacket(const ServerPacket &sp, void *hybaddrs, int step, size_t size) :
+            ServerPacket(sizeof(int) + size * Address::BYTES) {
+
+        addresses = NULL;
+
+        PutInt(sp.GetProto());
+        PutInt(sp.GetId());
+
+        PutInt(size);
+
+        char *it = (char *) hybaddrs;
+        Address *addr;
+
+        for (int i = 0; i < size; i++) {
+            addr = (Address *) (it + step * i);
+            PutInt(addr->GetAddress());
+            PutShort(addr->GetPort());
+        }
+    }
+
+    ClientsPacket::ClientsPacket(const ServerPacket &sp, vector<Address> &addrs) :
             ServerPacket(sizeof(int) + addrs.size() * Address::BYTES) {
 
         addresses = NULL;
