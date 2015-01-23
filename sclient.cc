@@ -11,8 +11,8 @@ using namespace net;
 
 vector<int> ignored;
 
-Address serverAddress(127, 0, 0, 1, 5428);
-//Address serverAddress(104, 236, 36, 132, 5428);
+//Address serverAddress(127, 0, 0, 1, 5428);
+Address serverAddress(104, 236, 36, 132, 5428);
 
 bool ShouldIgnore(int i) {
     for (int j = 0; j < ignored.size(); j++)
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 
         datagramSocket.Send(serverAddress, ClientsPacket());
 
-        for (int i = 0; i < RUN_N_TIMES; i++) {
+        for (int i = 0; i < i + 1; i++) {
             Address address;
             ServerPacket packet;
 

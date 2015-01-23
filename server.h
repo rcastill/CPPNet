@@ -40,6 +40,8 @@ namespace net {
            is received or timeout (if set) is completed. */
         void EnableThreadingModel();
 
+        void SetSendingInterval(long ms);
+
         // Gets connected clients collection
         vector<BackendClient>&GetClients();
 

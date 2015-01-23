@@ -93,6 +93,7 @@ namespace net {
     queue<ServerPacket*> squeue;            // std::queue (else)
 
     thread sthread;                         // Send thread (Threading model use)
+    long sendingInterval = 0;               // Sending interval (ms)
 
     /*
     * Sends packets in the send queue (the selected one) to
@@ -112,6 +113,9 @@ namespace net {
         do {
             static size_t size = commonQueue.Size();
             static size_t counter = 0;
+
+            if (usingThreads)   // It's nap time!!!
+                this_thread::sleep_for(chrono::milliseconds(sendingInterval));
 
             ServerPacket *packet;
 
@@ -134,6 +138,9 @@ namespace net {
                 if (clients[i].IsPendant(packet->GetId())) {        // if this packet was not ack'd
                     packet->GetAddress().Set(clients[i]);
                     server->Send(packet);                           // send it
+
+                    cout << "Queued packet sent (" << packet->GetId() << ")" << endl;
+
                     pendantCount++;                                 // Client pendant
                 }
 
@@ -178,6 +185,10 @@ namespace net {
             usingThreads = true;
             sthread = thread(SendPendant, this);    // Spawn thread
         }
+    }
+
+    void Server::SetSendingInterval(long ms) {
+        sendingInterval = ms;
     }
 
     vector<BackendClient> &Server::GetClients() {
@@ -246,11 +257,12 @@ namespace net {
 
             if (!usingThreads)  // else model, send packets in queue to those who are still pendant
                 while (SendPendant(this));
-        }
 
-    }
+        } // while (running)
 
-}
+    } // void Server::Mainloop()
+
+} // namespace net
 
 using namespace net;
 
@@ -277,11 +289,12 @@ int main(int argc, char **argv) {
 
     if (NetworkInit()) {
         Server server(port);
-        cout << "Threading model " << endl;
+        cout << "Threading model ";
 
         if (shouldUseThreadingModel) {
             cout << "enabled";
             server.EnableThreadingModel();  // Use threading model
+            server.SetSendingInterval(100); // Everybody needs to sleep
         }
 
         else
