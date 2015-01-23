@@ -277,9 +277,17 @@ int main(int argc, char **argv) {
 
     if (NetworkInit()) {
         Server server(port);
+        cout << "Threading model " << endl;
 
-        if (shouldUseThreadingModel)
+        if (shouldUseThreadingModel) {
+            cout << "enabled";
             server.EnableThreadingModel();  // Use threading model
+        }
+
+        else
+            cout << "disabled";
+
+        cout << endl;
 
         if (server.IsValid() && server.IsBound()) {
             cout << "Server bound @ " << server.GetAddress().ToString() << endl;
