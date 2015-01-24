@@ -8,6 +8,8 @@
 #include <thread>
 #endif
 
+#include <cstdio>
+
 /*
 * Hybrid queue wrapper. It could be a blocking queue
 * or a standart queue. It will be set depending on the
@@ -174,8 +176,15 @@ namespace net {
 
             // Do release heap for code's sake
             bsqueue.Doit([](ServerPacket *&packet) {
+                printf("Releasing heap from bqueue @ %p", packet);
                 delete packet;
             });
+
+            /*size_t size = bsqueue.Size();
+            for (size_t t = 0; t < size; t++) {
+                ServerPacket *popped = bsqueue.Pop();
+                delete popped;
+            }*/
         }
     }
 
@@ -241,6 +250,7 @@ namespace net {
                     cout << "Client connected (" << address.ToString() << ")" << endl;
 
                     ConnectionPacket *connectionPacket = new ConnectionPacket(address, true);   // Notification
+                    printf("Connection notification created @ %p", connectionPacket);
 
                     for (i = 0; i < clients.size(); i++)    // Every client has a pendant notification
                         clients[i].SetPendant(connectionPacket->GetId());

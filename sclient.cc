@@ -11,8 +11,8 @@ using namespace net;
 
 vector<int> ignored;
 
-//Address serverAddress(127, 0, 0, 1, 5428);
-Address serverAddress(104, 236, 36, 132, 5428);
+Address serverAddress(127, 0, 0, 1, 5428);
+//Address serverAddress(104, 236, 36, 132, 5428);
 
 bool ShouldIgnore(int i) {
     for (int j = 0; j < ignored.size(); j++)
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
 
                     ServerPacket ack(SERVNOTF_ACKNOWLEDGEMENT, id);
                     ack.GetAddress().Set(serverAddress);
-                    datagramSocket.Send(ack);
+                    //datagramSocket.Send(ack);
 
                     break;
                 }

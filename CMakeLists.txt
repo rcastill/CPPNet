@@ -14,6 +14,8 @@ add_library(ServerPacket dev/spacket.cc)
 add_library(ClientsPacket dev/cpacket.cc)
 add_library(ConnectionPacket dev/connpacket.cc)
 add_library(BackendClient bclient.cc)
+add_library(Bitfield4Bytes dev/bitfield4bytes.cc)
+add_library(GamePacket dev/gpacket.cc)
 
 target_link_libraries(DatagramSocket Address Packet ByteBuffer)
 target_link_libraries(Packet ByteBuffer Address)

@@ -35,6 +35,13 @@ void BackendClient::Process(ServerPacket &packet) {
             break;
         }
 
+        case GAME_INPUT_PACKET: {
+            /*
+            * Get ack - ackb
+            * */
+            break;
+        };
+
         default:
             cout << "Unkonwn protocol. Dropped." << endl;
             break;
